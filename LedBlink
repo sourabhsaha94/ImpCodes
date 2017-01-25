@@ -1,0 +1,26 @@
+// Import Electric Imp’s WS2812 library
+#require "WS2812.class.nut:2.0.2"
+
+// Set up global variables
+spi <- null;
+led <- null;
+state <- false;
+
+// Define the loop flash function
+function flash() {
+    state = !state;
+    local color = state ? [255,0,0] : [0,255,0];
+    led.set(0, color).draw();
+    imp.wakeup(1.0, flash); 
+}
+
+// Set up the SPI bus the RGB LED connects to
+spi = hardware.spi257;
+spi.configure(MSB_FIRST, 7500);
+hardware.pin1.configure(DIGITAL_OUT, 1);
+
+// Set up the RGB LED
+led = WS2812(spi, 1);
+
+// Start the flash loop
+flash();
